@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mt5_Trading_Bot_Signal_Mechanism - Memory Wiki</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .back { display: inline-block; margin-bottom: 20px; color: #0066cc; text-decoration: none; }
+        .back:hover { text-decoration: underline; }
+        .note-content { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back">&larr; Back to Index</a>
+    <h1>Mt5_Trading_Bot_Signal_Mechanism</h1>
+    <div class="note-content"># How the Trading Bot Reads Telegram Signals<br>
+<br>
+The bot uses a Python library called <strong>Telethon<strong>, not a standard Telegram "Bot". This is the key to accessing a private channel. Telethon allows a script to connect to Telegram's network by acting as a real user account (your account).<br>
+<br>
+### Step-by-Step Process<br>
+<br>
+1.  <strong>Credentials<strong>: You will provide an `api_id` and `api_hash` obtained from your account on [my.telegram.org](https://my.telegram.org). These are developer keys that authorize your script to connect to your account.<br>
+<br>
+2.  <strong>One-Time Login<strong>: The first time the script runs on the VPS, it will require a manual login. You will need to provide:<br>
+    <em>   Your phone number.<br>
+    <em>   A login code sent to your official Telegram app.<br>
+    <em>   Your Two-Factor Authentication (2FA) password, if enabled.<br>
+<br>
+3.  <strong>Session File<strong>: Upon successful login, Telethon creates a `.session` file. This file contains the authorization key, allowing the script to reconnect automatically in the future without needing your credentials or a new code. This file is stored securely on your VPS.<br>
+<br>
+4.  <strong>Channel Monitoring<strong>: Since the script is authenticated as you, it can see all your chats, including the private ProTrader channel. We will configure the script to monitor this specific channel.<br>
+<br>
+5.  <strong>Real-Time Event Listening<strong>: The script will run continuously, listening for a "new message" event from the target channel.<br>
+<br>
+6.  <strong>Instant Parsing<strong>: The moment a message is posted, the script will grab its text content and immediately apply the parsing rules we defined to extract the trade parameters.<br>
+<br>
+7.  <strong>Execution<strong>: The parsed data is then sent to the MT5 component to place the trade on your PU Prime account.<br>
+<br>
+This method allows the bot to operate reliably and instantly, just as if you were manually reading the signals and placing the trades yourself.<br>
+</div>
+</body>
+</html>

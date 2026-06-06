@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mt5_Trading_Bot_Plan - Memory Wiki</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .back { display: inline-block; margin-bottom: 20px; color: #0066cc; text-decoration: none; }
+        .back:hover { text-decoration: underline; }
+        .note-content { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back">&larr; Back to Index</a>
+    <h1>Mt5_Trading_Bot_Plan</h1>
+    <div class="note-content"># MT5 Telegram Trading Bot Implementation Plan<br>
+<br>
+For Hermes: Use subagent-driven-development skill to implement this plan task-by-task.<br>
+<br>
+Goal: Create a trading bot running on a Linux VPS that receives gold trading signals from a private Telegram chat and executes them on PU Prime MT5.<br>
+<br>
+Architecture: A Python Telethon client monitors the Telegram chat, parses the message, and sends the trade parameters via a local network socket. A native MQL5 script running inside MT5 on Wine acts as a socket client, receives the commands, and opens/modifies trades.<br>
+<br>
+Tech Stack: Python, Telethon, Wine, MetaTrader 5, MQL5, Docker.<br>
+<br>
+---<br>
+<br>
+### Task 1: Setup VPS environment with Wine and MetaTrader 5<br>
+<br>
+Objective: Install Wine and run MetaTrader 5 on the Linux VPS in a virtual frame buffer.<br>
+<br>
+Files:<br>
+- Create: scripts/setup_env.sh<br>
+- Create: scripts/run_mt5.sh<br>
+<br>
+Step 1: Install Wine, Xvfb, and winetricks on the Ubuntu droplet.<br>
+Step 2: Start a virtual frame buffer on display port 99.<br>
+Step 3: Download and install the PU Prime MT5 terminal inside the Wine prefix.<br>
+Step 4: Launch the terminal and log in with your PU Prime credentials.<br>
+<br>
+Verification: Run a process check to verify terminal.exe runs under Wine.<br>
+<br>
+---<br>
+<br>
+### Task 2: Develop Python Telegram Listener<br>
+<br>
+Objective: Create a Python client using Telethon to connect to your Telegram account and listen to the target channel.<br>
+<br>
+Files:<br>
+- Create: src/telegram_listener.py<br>
+- Create: src/config.py<br>
+- Create: requirements.txt<br>
+<br>
+Step 1: Write requirements.txt with telethon.<br>
+Step 2: Write config.py to load API ID, API hash, and target channel name from environment variables.<br>
+Step 3: Create telegram_listener.py using Telethon to log in and listen to the channel.<br>
+Step 4: Parse messages to extract order type, entry price, stop loss, and take profit stages.<br>
+<br>
+Verification: Run python src/telegram_listener.py and send a test message to a test channel to verify extraction.<br>
+<br>
+---<br>
+<br>
+### Task 3: Develop Python Socket Server<br>
+<br>
+Objective: Create a local TCP socket server in Python to forward signals to MT5.<br>
+<br>
+Files:<br>
+- Create: src/socket_server.py<br>
+- Modify: src/telegram_listener.py<br>
+<br>
+Step 1: Write socket_server.py to open a local TCP port and listen for connections.<br>
+Step 2: Update telegram_listener.py to send parsed trade data to the socket server.<br>
+Step 3: Handle disconnects and retries on both sides.<br>
+<br>
+Verification: Run python src/socket_server.py and verify it accepts local connections.<br>
+<br>
+---<br>
+<br>
+### Task 4: Develop MQL5 Socket Client<br>
+<br>
+Objective: Write an MQL5 script for MetaTrader 5 to connect to the local Python socket server.<br>
+<br>
+Files:<br>
+- Create: src/mt5_socket_client.mq5<br>
+<br>
+Step 1: Write mt5_socket_client.mq5 using native MQL5 socket functions.<br>
+Step 2: Connect to the local port on startup.<br>
+Step 3: Parse incoming JSON strings containing action, stop loss, and take profit.<br>
+Step 4: Execute orders using the Trade library.<br>
+<br>
+Verification: Compile the script in MetaEditor and drag it onto a gold chart. Verify connection in the MT5 Experts log.<br>
+<br>
+---<br>
+<br>
+### Task 5: End to End Integration<br>
+<br>
+Objective: Run all components together and test with a simulated Telegram signal.<br>
+<br>
+Files:<br>
+- Create: scripts/run_bot.sh<br>
+<br>
+Step 1: Start Xvfb and MetaTrader 5.<br>
+Step 2: Start the MQL5 script inside MetaTrader 5.<br>
+Step 3: Start the Python socket server and Telegram listener.<br>
+Step 4: Send a test signal in the monitored Telegram chat.<br>
+<br>
+Verification: Verify the trade executes instantly on the MT5 gold chart with correct stop loss and take profit targets.<br>
+</div>
+</body>
+</html>
