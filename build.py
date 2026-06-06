@@ -5,7 +5,10 @@ from datetime import datetime
 
 # Paths
 SESSIONS_DIR = Path.home() / ".hermes" / "sessions"
-OBSIDIAN_DIR = Path.home() / "Documents" / "memory"
+OBSIDIAN_DIRS = [
+    Path.home() / "Documents" / "memory",
+    Path.home() / "Documents" / "hermes-memory" / "memory"
+]
 OUTPUT_DIR = Path.home() / "memory-wiki" / "docs"
 
 def get_sessions():
@@ -25,16 +28,26 @@ def get_sessions():
 
 def get_obsidian_notes():
     notes = []
-    for md_file in OBSIDIAN_DIR.rglob("*.md"):
-        if md_file.name.startswith("."):
+    seen_paths = set()
+    for base_dir in OBSIDIAN_DIRS:
+        if not base_dir.exists():
             continue
-        notes.append({
-            "title": md_file.stem.replace("-", " ").title(),
-            "path": str(md_file),
-            "safe_name": md_file.relative_to(OBSIDIAN_DIR).name.replace(" ", "_"),
-            "date": md_file.stat().st_mtime,
-            "type": "note"
-        })
+        for md_file in base_dir.rglob("*.md"):
+            if md_file.name.startswith("."):
+                continue
+            # Use absolute path to deduplicate if files exist in both
+            abs_path = str(md_file.resolve())
+            if abs_path in seen_paths:
+                continue
+            seen_paths.add(abs_path)
+
+            notes.append({
+                "title": md_file.stem.replace("-", " ").title(),
+                "path": str(md_file),
+                "safe_name": md_file.name.replace(" ", "_"),
+                "date": md_file.stat().st_mtime,
+                "type": "note"
+            })
     return sorted(notes, key=lambda x: x["date"], reverse=True)
 
 def build_detail_pages(sessions, notes):
@@ -47,7 +60,7 @@ def build_detail_pages(sessions, notes):
                     data = json.load(f)
                     msgs = data.get("messages", [])
                     content = "<ul>"
-                    for msg in msgs[:50]: # Limit to 50 messages for brevity
+                    for msg in msgs[:50]:
                         role = msg.get("role", "unknown").capitalize()
                         text = msg.get("content", "")
                         if isinstance(text, list):
@@ -88,7 +101,6 @@ def build_detail_pages(sessions, notes):
         try:
             with open(n["path"], "r") as f:
                 md_content = f.read()
-            # Basic markdown to HTML conversion (naive)
             html_content = md_content.replace("\n", "<br>\n").replace("**", "<strong>").replace("*", "<em>")
         except Exception as e:
             html_content = f"<p>Error reading note: {e}</p>"
@@ -124,7 +136,6 @@ def build():
 
     build_detail_pages(sessions, notes)
 
-    # Generate simple index.html
     html = """<!DOCTYPE html>
 <html lang="en-GB">
 <head>
