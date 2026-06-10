@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agents - Memory Wiki</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .back { display: inline-block; margin-bottom: 20px; color: #0066cc; text-decoration: none; }
+        .back:hover { text-decoration: underline; }
+        .note-content { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back">&larr; Back to Index</a>
+    <h1>Agents</h1>
+    <div class="note-content"># Agents bridge rules<br>
+<br>
+## Purpose<br>
+This folder is the shared bridge between Mac Hermes and VPS Hermes.<br>
+<br>
+## Ownership<br>
+- Mac Hermes may write to ./mac/<br>
+- VPS Hermes may write to ./vps/<br>
+- Both agents may read ./shared/<br>
+- ./handoffs/ is for explicit requests passed from one agent to the other<br>
+<br>
+## Safety<br>
+- Do not edit or summarise by modifying ../MEMORY.md or ../USER.md<br>
+- Do not move, rename, or delete existing top-level memory folders<br>
+- Do not store secrets, API keys, tokens, passwords, or credentials in this bridge<br>
+<br>
+## Writing rules<br>
+- Prefer new dated markdown notes over overwriting existing files<br>
+- Keep notes short, factual, and scoped<br>
+- Promote only distilled facts, summaries, and handoff context into ./shared/<br>
+- Use ./handoffs/ for clear task transfer between agents<br>
+</div>
+</body>
+</html>
