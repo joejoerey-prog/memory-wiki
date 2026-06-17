@@ -24,48 +24,38 @@ phase: Demo Validation<br>
 <br>
 # MT5 Demo Testing Tracker<br>
 <br>
-## Current Progress<br>
+## Current Progress (Verified MT5 Data)<br>
 - <strong>Target:<strong> 100 successful trades<br>
-- <strong>Current:<strong> 0<br>
+- <strong>Current:<strong> 9 Wins / 11 Losses / 0 BE (20 total closed)<br>
+- <strong>Loss Rate:<strong> 55% ⚠️ (target: ≤10%)<br>
+- <strong>Win/BE Rate:<strong> 45% (target: ≥90%)<br>
 - <strong>Milestones:<strong> 50, 75, 100<br>
 - <strong>Alert at:<strong> 100 trades triggers micro-live transition<br>
 <br>
+## Daily Status Summary - 2026-06-15 (VERIFIED)<br>
+- <strong>Bot Status:<strong> ✅ Running (PID active, logging to mt5_bot.log)<br>
+- <strong>Trade Count:<strong> 20 closed since bot start (June 12)<br>
+- <strong>Active Risk Rules:<strong> ✅ 30-pip block removed; Break-Even on TP1 active<br>
+- <strong>Cron Health:<strong> ✅ Trade Counter + Health Check active Mon-Fri 04:30-20:30<br>
+- <strong>Strategy Monitor:<strong> ✅ Running every 20 minutes (auto-pauses at target)<br>
+- ⚠️ 14:07 BUY LIMITS signal missed — fell in backfill gap during bot restart<br>
+<br>
+## Break-Even on TP1 Logic<br>
+- TP1 extracted from signal and saved with each trade<br>
+- Background monitor checks every 10 seconds<br>
+- When TP1 is hit, SL auto-moves to entry price (break-even)<br>
+- Goal: Convert losses into break-evens<br>
+<br>
+## Losing Streak Analysis (June 15, 10:54-11:32)<br>
+- 6 consecutive losses in choppy market<br>
+- Bot was buying into falling prices repeatedly<br>
+- Monitor will trigger proactive strategy review if loss rate exceeds 20%<br>
+<br>
 ## Testing Phases<br>
-### Phase 1: Demo Validation ✅ STARTED<br>
-- Goal: 100 successful trades<br>
-- Monitor: Every 2 hours via cron job<br>
-- Alert: At milestones (50, 75, 100)<br>
-<br>
+### Phase 1: Demo Validation ✅ STARTED (June 12)<br>
 ### Phase 2: Market Regime Coverage<br>
-- Bull trending markets<br>
-- Bear trending markets<br>
-- Choppy/sideways ranges<br>
-- High volatility events<br>
-- Low liquidity periods<br>
-<br>
 ### Phase 3: Execution Reality Check<br>
-- Daily MT5 Journal/Experts audit<br>
-- Order fill quality vs backtest<br>
-- SL/TP modification reliability<br>
-- Disconnection recovery testing<br>
-<br>
 ### Phase 4: Micro-Live Transition (At 100 Trades)<br>
-- Fund $100 micro account<br>
-- Lot size 0.01 minimum<br>
-- Run 2-4 weeks<br>
-- Measure slippage impact<br>
-<br>
-## Automated Alerts<br>
-- Trade counter: Every 2 hours<br>
-- Milestone notifications: 50, 75, 100 trades<br>
-- Health checks: Every 30 minutes (separate cron)<br>
-<br>
-## Weekly Tasks<br>
-- [ ] Review MT5 Journal for errors<br>
-- [ ] Log market regime experienced<br>
-- [ ] Test VPS disconnection recovery<br>
-- [ ] Verify SL/TP modifications working<br>
-- [ ] Update this tracker<br>
 </div>
 </body>
 </html>
