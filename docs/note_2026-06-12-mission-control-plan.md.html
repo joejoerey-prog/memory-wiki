@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 06 12 Mission Control Plan - Memory Wiki</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .back { display: inline-block; margin-bottom: 20px; color: #0066cc; text-decoration: none; }
+        .back:hover { text-decoration: underline; }
+        .note-content { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back">&larr; Back to Index</a>
+    <h1>2026 06 12 Mission Control Plan</h1>
+    <div class="note-content"># Mission Control Dashboard Implementation Plan<br>
+<br>
+> <strong>For agentic workers:<strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.<br>
+<br>
+<strong>Goal:<strong> Build a Tauri-based desktop dashboard that orchestrates multiple LLMs, integrates with VS Code and Google Antigravity, and monitors local/remote automations.<br>
+<br>
+<strong>Architecture:<strong> A Tauri application with a Rust backend handling secure API routing, local CLI execution, and WebSocket/IPC communication. The frontend is a React + TypeScript + Vite application rendering a 4-column terminal-themed layout.<br>
+<br>
+<strong>Tech Stack:<strong> Tauri (Rust), React, TypeScript, Vite, Tailwind CSS (or custom CSS for terminal theme), Node.js.<br>
+<br>
+---<br>
+<br>
+### Task 1: Initialize Tauri Project Structure<br>
+<br>
+<strong>Files:<strong><br>
+- Create: `package.json`, `vite.config.ts`, `tsconfig.json`<br>
+- Create: `src-tauri/Cargo.toml`, `src-tauri/src/main.rs`<br>
+- Create: `src/main.tsx`, `src/App.tsx`, `src/index.html`<br>
+<br>
+- [ ] <strong>Step 1: Create project directory and initialize npm<strong><br>
+<br>
+Run: `mkdir mission-control && cd mission-control && npm init -y`<br>
+<br>
+- [ ] <strong>Step 2: Install frontend dependencies<strong><br>
+<br>
+Run: `npm install react react-dom @tauri-apps/api`<br>
+Run: `npm install -D vite @vitejs/plugin-react typescript @types/react @types/react-dom tauri-cli`<br>
+<br>
+- [ ] <strong>Step 3: Initialize Tauri backend<strong><br>
+<br>
+Run: `npm run tauri init`<br>
+Expected: Prompts for app name ("mission-control"), window title ("Mission Control"), and dist directory ("../dist"). Accept defaults for web assets and dev command.<br>
+<br>
+- [ ] <strong>Step 4: Commit initial structure<strong><br>
+<br>
+Run: `git add . && git commit -m "chore: initialize tauri project structure"`<br>
+<br>
+### Task 2: Implement Terminal Theme CSS<br>
+<br>
+<strong>Files:<strong><br>
+- Create: `src/styles/terminal.css`<br>
+- Modify: `src/index.html` (link stylesheet)<br>
+- Modify: `src/App.tsx` (apply base classes)<br>
+<br>
+- [ ] <strong>Step 1: Create terminal theme stylesheet<strong><br>
+<br>
+```css<br>
+/<em> src/styles/terminal.css <em>/<br>
+:root {<br>
+  --bg-primary: #050505;<br>
+  --bg-secondary: #0a0a0a;<br>
+  --bg-tertiary: #0D2818;<br>
+  --text-primary: #4CAF50;<br>
+  --text-bright: #81C784;<br>
+  --border-color: #2E7D32;<br>
+}<br>
+<br>
+body {<br>
+  background-color: var(--bg-primary) !important;<br>
+  color: var(--text-primary) !important;<br>
+  font-family: 'Courier New', Courier, monospace !important;<br>
+  font-weight: bold !important;<br>
+  margin: 0;<br>
+  padding: 0;<br>
+  height: 100vh;<br>
+  overflow: hidden;<br>
+}<br>
+<br>
+.mockup, .panel, .input-box, .placeholder {<br>
+  background-color: var(--bg-secondary) !important;<br>
+  border: 1px solid var(--border-color) !important;<br>
+  color: var(--text-primary) !important;<br>
+  font-weight: bold !important;<br>
+  border-radius: 4px;<br>
+}<br>
+<br>
+.panel-header {<br>
+  padding: 8px;<br>
+  font-weight: bold;<br>
+  border-bottom: 2px solid var(--border-color);<br>
+  text-transform: uppercase;<br>
+  font-size: 12px;<br>
+}<br>
+<br>
+.btn-terminal {<br>
+  background-color: var(--bg-tertiary) !important;<br>
+  color: var(--text-primary) !important;<br>
+  border: 1px solid var(--border-color) !important;<br>
+  font-weight: bold !important;<br>
+  cursor: pointer;<br>
+  padding: 8px;<br>
+  border-radius: 4px;<br>
+}<br>
+<br>
+.btn-terminal:hover {<br>
+  background-color: #1a4d2e !important;<br>
+}<br>
+```<br>
+<br>
+- [ ] <strong>Step 2: Link stylesheet in HTML<strong><br>
+<br>
+Modify `src/index.html`: Add `<link rel="stylesheet" href="/src/styles/terminal.css" />` in the `<head>`.<br>
+<br>
+- [ ] <strong>Step 3: Commit theme<strong><br>
+<br>
+Run: `git add src/styles/terminal.css src/index.html && git commit -m "feat: add terminal theme css"`<br>
+<br>
+### Task 3: Build Model Selector Component<br>
+<br>
+<strong>Files:<strong><br>
+- Create: `src/components/ModelSelector.tsx`<br>
+- Modify: `src/App.tsx`<br>
+<br>
+- [ ] <strong>Step 1: Create ModelSelector component<strong><br>
+<br>
+```tsx<br>
+// src/components/ModelSelector.tsx<br>
+import React from 'react';<br>
+<br>
+interface ModelSelectorProps {<br>
+  selectedModel: string;<br>
+  onSelect: (model: string) => void;<br>
+}<br>
+<br>
+export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onSelect }) => {<br>
+  const models = ['HERMES', 'GEMINI', 'PERPLEXITY', 'CHATGPT'];<br>
+<br>
+  return (<br>
+    <div className="panel" style={{ flex: '0.4', display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px' }}><br>
+      <div className="panel-header" style={{ textAlign: 'center' }}>Routes</div><br>
+      {models.map((model) => (<br>
+        <button<br>
+          key={model}<br>
+          className="btn-terminal"<br>
+          style={{ <br>
+            flex: 1, <br>
+            backgroundColor: selectedModel === model ? 'var(--border-color)' : 'var(--bg-tertiary)'<br>
+          }}<br>
+          onClick={() => onSelect(model)}<br>
+        ><br>
+          {model}<br>
+        </button><br>
+      ))}<br>
+    </div><br>
+  );<br>
+};<br>
+```<br>
+<br>
+- [ ] <strong>Step 2: Integrate into App.tsx<strong><br>
+<br>
+Modify `src/App.tsx` to include a basic layout shell and the `ModelSelector` component. Set default selected model to 'HERMES'.<br>
+<br>
+- [ ] <strong>Step 3: Commit component<strong><br>
+<br>
+Run: `git add src/components/ModelSelector.tsx src/App.tsx && git commit -m "feat: add model selector component"`<br>
+<br>
+### Task 4: Build Chat Panel Component<br>
+<br>
+<strong>Files:<strong><br>
+- Create: `src/components/ChatPanel.tsx`<br>
+- Modify: `src/App.tsx`<br>
+<br>
+- [ ] <strong>Step 1: Create ChatPanel component<strong><br>
+<br>
+```tsx<br>
+// src/components/ChatPanel.tsx<br>
+import React, { useState } from 'react';<br>
+<br>
+interface Message {<br>
+  role: 'user' | 'ai';<br>
+  sender: string;<br>
+  content: string;<br>
+}<br>
+<br>
+export const ChatPanel: React.FC = () => {<br>
+  const [messages, setMessages] = useState<Message[]>([<br>
+    { role: 'ai', sender: 'Hermes', content: 'Fetching VS Code state...' }<br>
+  ]);<br>
+  const [input, setInput] = useState('');<br>
+<br>
+  const handleSend = () => {<br>
+    if (!input.trim()) return;<br>
+    setMessages([...messages, { role: 'user', sender: 'You', content: input }]);<br>
+    setInput('');<br>
+    // TODO: Wire to backend command in Task 8<br>
+  };<br>
+<br>
+  return (<br>
+    <div className="panel" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}><br>
+      <div className="panel-header">AI Command Center</div><br>
+      <div style={{ padding: '12px', flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}><br>
+        {messages.map((msg, idx) => (<br>
+          <div key={idx} style={{ <br>
+            background: msg.role === 'ai' ? 'var(--bg-tertiary)' : 'var(--bg-secondary)', <br>
+            padding: '8px', <br>
+            borderRadius: '6px', <br>
+            fontSize: '12px',<br>
+            border: `1px solid ${msg.role === 'ai' ? 'var(--border-color)' : '#0D2818'}`,<br>
+            marginLeft: msg.role === 'user' ? '20px' : '0'<br>
+          }}><br>
+            <strong style={{ color: 'var(--text-bright)' }}>{`> ${msg.sender}:`}</strong> {msg.content}<br>
+          </div><br>
+        ))}<br>
+      </div><br>
+      <div style={{ display: 'flex', padding: '8px', gap: '8px' }}><br>
+        <input <br>
+          className="input-box"<br>
+          style={{ flex: 1, padding: '8px', color: 'var(--text-primary)', background: 'transparent', border: '1px solid var(--border-color)' }}<br>
+          placeholder="> Type your command..."<br>
+          value={input}<br>
+          onChange={(e) => setInput(e.target.value)}<br>
+          onKeyDown={(e) => e.key === 'Enter' && handleSend()}<br>
+        /><br>
+        <button className="btn-terminal" onClick={handleSend}>Send</button><br>
+        /div><br>
+    </div><br>
+  );<br>
+};<br>
+```<br>
+<br>
+- [ ] <strong>Step 2: Integrate into App.tsx layout<strong><br>
+<br>
+Modify `src/App.tsx` to place `ChatPanel` in the left-mid column (flex: 1) next to `ModelSelector`.<br>
+<br>
+- [ ] <strong>Step 3: Commit component<strong><br>
+<br>
+Run: `git add src/components/ChatPanel.tsx src/App.tsx && git commit -m "feat: add chat panel component"`<br>
+<br>
+### Task 5: Build Workspace Panel Component<br>
+<br>
+<strong>Files:<strong><br>
+- Create: `src/components/WorkspacePanel.tsx`<br>
+- Modify: `src/App.tsx`<br>
+<br>
+- [ ] <strong>Step 1: Create WorkspacePanel component<strong><br>
+<br>
+```tsx<br>
+// src/components/WorkspacePanel.tsx<br>
+import React from 'react';<br>
+<br>
+export const WorkspacePanel: React.FC = () => {<br>
+  return (<br>
+    <div className="panel" style={{ flex: 2, display: 'flex', flexDirection: 'column' }}><br>
+      <div className="panel-header">Workspace & IDEs</div><br>
+      <div style={{ padding: '12px', display: 'flex', gap: '8px', flex: 1 }}><br>
+        <br>
+        {/<em> VS Code Status <em>/}<br>
+        <div className="placeholder" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--border-color)' }}><br>
+          <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>VS Code</div><br>
+          <div style={{ fontSize: '11px' }}>workspace: hermes-memory</div><br>
+          <div style={{ fontSize: '11px', color: 'var(--text-primary)' }}>● Connected</div><br>
+        </div><br>
+<br>
+        {/<em> Antigravity Status <em>/}<br>
+        <div className="placeholder" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--border-color)' }}><br>
+          <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '4px' }}>Antigravity</div><br>
+          <div style={{ fontSize: '11px' }}>agent: idle</div><br>
+          <button className="btn-terminal" style={{ marginTop: '6px', fontSize: '10px' }}>Push Task</button><br>
+        </div><br>
+<br>
+      </div><br>
+    </div><br>
+  );<br>
+};<br>
+```<br>
+<br>
+- [ ] <strong>Step 2: Integrate into App.tsx layout<strong><br>
+<br>
+Modify `src/App.tsx` to place `WorkspacePanel` in the center column (flex: 2).<br>
+<br>
+- [ ] <strong>Step 3: Commit component<strong><br>
+<br>
+Run: `git add src/components/WorkspacePanel.tsx src/App.tsx && git commit -m "feat: add workspace panel component"`<br>
+<br>
+### Task 6: Build Automation Panel Component<br>
+<br>
+<strong>Files:<strong><br>
+- Create: `src/components/AutomationPanel.tsx`<br>
+- Modify: `src/App.tsx`<br>
+<br>
+- [ ] <strong>Step 1: Create AutomationPanel component<strong><br>
+<br>
+```tsx<br>
+// src/components/AutomationPanel.tsx<br>
+import React from 'react';<br>
+<br>
+export const AutomationPanel: React.FC = () => {<br>
+  return (<br>
+    <div className="panel" style={{ flex: 0.8, display: 'flex', flexDirection: 'column' }}><br>
+      <div className="panel-header">Automations</div><br>
+      <div style={{ padding: '12px', flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}><br>
+        <br>
+        <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', padding: '8px', borderRadius: '4px', fontSize: '11px' }}><br>
+          <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>Daily Sync (06:00 UTC)</div><br>
+          <div style={{ color: 'var(--text-primary)' }}>Last run: 06:00:01 (Success)</div><br>
+        </div><br>
+<br>
+        <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)', padding: '8px', borderRadius: '4px', fontSize: '11px' }}><br>
+          <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>MT5 Bot Health (VPS)</div><br>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}><br>
+            <span>CPU: 12%</span><br>
+            <span style={{ color: 'var(--text-primary)' }}>● Active</span><br>
+          </div><br>
+        </div><br>
+<br>
+      </div><br>
+    </div><br>
+  );<br>
+};<br>
+```<br>
+<br>
+- [ ] <strong>Step 2: Integrate into App.tsx layout<strong><br>
+<br>
+Modify `src/App.tsx` to place `AutomationPanel` in the right column (flex: 0.8). Ensure the root `App` container uses `display: flex` and `height: 100vh`.<br>
+<br>
+- [ ] <strong>Step 3: Commit component<strong><br>
+<br>
+Run: `git add src/components/AutomationPanel.tsx src/App.tsx && git commit -m "feat: add automation panel component"`<br>
+<br>
+### Task 7: Implement Rust Backend Command Stubs<br>
+<br>
+<strong>Files:<strong><br>
+- Modify: `src-tauri/src/main.rs`<br>
+- Create: `src-tauri/src/commands.rs`<br>
+<br>
+- [ ] <strong>Step 1: Define Tauri commands in commands.rs<strong><br>
+<br>
+```rust<br>
+// src-tauri/src/commands.rs<br>
+use tauri::Command;<br>
+<br>
+#[tauri::command]<br>
+pub async fn route_llm_request(model: String, prompt: String) -> Result<String, String> {<br>
+    // Minimal implementation: echo the request to verify routing<br>
+    Ok(format!("Routed to {}: {}", model, prompt))<br>
+}<br>
+<br>
+#[tauri::command]<br>
+pub async fn get_vscode_state() -> Result<String, String> {<br>
+    // Minimal implementation: return static connected state<br>
+    Ok("{\"workspace\": \"hermes-memory\", \"status\": \"connected\"}".to_string())<br>
+}<br>
+<br>
+#[tauri::command]<br>
+pub async fn trigger_antigravity_task(task_desc: String) -> Result<String, String> {<br>
+    // Minimal implementation: acknowledge task receipt<br>
+    Ok(format!("Task queued for Antigravity: {}", task_desc))<br>
+}<br>
+<br>
+#[tauri::command]<br>
+pub async fn get_automation_status() -> Result<String, String> {<br>
+    // Minimal implementation: return static health check<br>
+    Ok("{\"mt5_bot\": \"Active\", \"cpu\": \"12%\"}".to_string())<br>
+}<br>
+```<br>
+<br>
+- [ ] <strong>Step 2: Register commands in main.rs<strong><br>
+<br>
+Modify `src-tauri/src/main.rs` to include `mod commands;` and register the commands in the `.invoke_handler()`.<br>
+<br>
+- [ ] <strong>Step 3: Verify Rust compilation<strong><br>
+<br>
+Run: `cargo check --manifest-path src-tauri/Cargo.toml`<br>
+Expected: PASS with no errors.<br>
+<br>
+- [ ] <strong>Step 4: Commit backend stubs<strong><br>
+<br>
+Run: `git add src-tauri/src/main.rs src-tauri/src/commands.rs && git commit -m "feat: add rust backend command stubs"`<br>
+<br>
+### Task 8: Wire Frontend to Backend<br>
+<br>
+<strong>Files:<strong><br>
+- Modify: `src/components/ChatPanel.tsx`<br>
+- Modify: `src/components/WorkspacePanel.tsx`<br>
+- Modify: `src/components/AutomationPanel.tsx`<br>
+<br>
+- [ ] <strong>Step 1: Wire ChatPanel to `route_llm_request`<strong><br>
+<br>
+Modify `src/components/ChatPanel.tsx`: Import `invoke` from `@tauri-apps/api/tauri`. Update `handleSend` to call `invoke('route_llm_request', { model: selectedModel, prompt: input })` and append the result to messages.<br>
+<br>
+- [ ] <strong>Step 2: Wire WorkspacePanel to `get_vscode_state` and `trigger_antigravity_task`<strong><br>
+<br>
+Modify `src/components/WorkspacePanel.tsx`: Add `useEffect` to call `invoke('get_vscode_state')` on mount. Add `onClick` handler to the "Push Task" button to call `invoke('trigger_antigravity_task', { task_desc: 'Analyze current workspace' })`.<br>
+<br>
+- [ ] <strong>Step 3: Wire AutomationPanel to `get_automation_status`<strong><br>
+<br>
+Modify `src/components/AutomationPanel.tsx`: Add `useEffect` with a 5000ms interval to call `invoke('get_automation_status')` and update UI state.<br>
+<br>
+- [ ] <strong>Step 4: Run and verify application<strong><br>
+<br>
+Run: `npm run tauri dev`<br>
+Expected: App launches, UI renders with terminal theme. Clicking "Send" or "Push Task" logs backend responses without crashing.<br>
+<br>
+- [ ] <strong>Step 5: Commit wiring<strong><br>
+<br>
+Run: `git add src/components/<em>.tsx && git commit -m "feat: wire frontend components to tauri backend"`<br>
+</div>
+</body>
+</html>

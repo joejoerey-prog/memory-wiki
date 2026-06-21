@@ -15,6 +15,36 @@
 <body>
     <a href="index.html" class="back">&larr; Back to Index</a>
     <h1>2026 06 12_Mission_Control_Dashboard_Status</h1>
-    <div class="note-content"><p>Error reading note: [Errno 11] Resource deadlock avoided</p></div>
+    <div class="note-content"># Mission Control Dashboard Status<br>
+<br>
+<strong>Date:<strong> 2026-06-12<br>
+<strong>Status:<strong> Paused (awaiting user direction on CLI integration)<br>
+<strong>Location:<strong> `/Users/joerey/Documents/hermes-memory/mission-control`<br>
+<br>
+## Overview<br>
+A Tauri-based desktop dashboard for AI and automation orchestration, featuring a retro-terminal aesthetic (dark background, bright green bold text).<br>
+<br>
+## Completed Features<br>
+1. <strong>UI Layout:<strong> 4-column design (Models, AI Command Center, Workspace & IDEs, Automations).<br>
+2. <strong>Model Routing:<strong><br>
+   - <strong>Hermes:<strong> Executes locally via `hermes -z "<prompt>"` and returns the actual AI response.<br>
+   - <strong>Gemini / Perplexity / ChatGPT:<strong> Features "WEB" buttons that securely open the official sites in the default browser for Pro account login.<br>
+3. <strong>Workspace Monitoring:<strong> Reads git status and lists top-level files in `/Users/joerey/Documents/hermes-memory`.<br>
+4. <strong>Automation Monitoring:<strong> <br>
+   - Checks local `crontab` for the 06:00 UTC sync job.<br>
+   - Pings the MT5 Bot VPS (`165.232.45.88`) for reachability.<br>
+   - Attempts to pull DigitalOcean droplet metrics via `doctl`.<br>
+5. <strong>Antigravity Integration:<strong> Currently configured to launch the desktop application via macOS `open -a "Antigravity"`.<br>
+6. <strong>App Icon:<strong> Custom high-contrast, retro-futuristic terminal-style logo generated and embedded as a valid macOS `.icns` file.<br>
+7. <strong>Packaging:<strong> Successfully compiled and bundled as `mission-control_0.1.0_aarch64.dmg`.<br>
+<br>
+## Pending Decisions<br>
+The user requested to "add cli instead" before pausing. Clarification needed on whether this means:<br>
+- <strong>A:<strong> Running a specific Antigravity CLI command instead of opening the desktop app.<br>
+- <strong>B:<strong> Converting the entire dashboard into a terminal-based CLI tool.<br>
+- <strong>C:<strong> Adding an interactive terminal panel <em>inside<em> the existing GUI.<br>
+<br>
+## Next Steps<br>
+Resume task upon user's return and clarification of the CLI requirement.</div>
 </body>
 </html>
